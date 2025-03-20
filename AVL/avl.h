@@ -1,9 +1,12 @@
 #include<stdbool.h>
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) > (b) ? (a) : (b))
+
 typedef struct treeNode {
     int val;
-    struct treeNode* left, right;
     int height;
+    struct treeNode *left, *right;
 } TreeNode;
 
 
