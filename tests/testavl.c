@@ -48,6 +48,14 @@ int TestUpdateHeight02() {
     } return 0;
 }
 
+int TestBalance01() {
+    TreeNode one = {1, 1, NULL, NULL};
+    TreeNode two = {2, 2, NULL, &one};
+    if(balance(&one) == 0 && balance(&two) == -1) {
+        return 1;
+    }  return 0;
+}
+
 int TestSearch01() { // test search not found
     TreeNode* root = NULL;
     if(search(root, 1) == NULL) {
@@ -135,9 +143,44 @@ int TestRightRotate01() {
     } return 0;
 }
 
+int TestInsert01() {
+    TreeNode* root = NULL;
+    TreeNode* newRoot = insert(root, 1);
+    if(newRoot->val == 1 && newRoot->height == 1) {
+        freeTree(newRoot);
+        return 1;
+    }
+    freeTree(newRoot);
+    return 0;
+}
+
+int TestInsert02() {
+    TreeNode* root = NULL;
+    root = insert(root, 10);
+    if (!(root->val == 10 && root->height == 1)) {
+        return 0;
+    }
+    root = insert(root, 20);
+    if (!(root->val == 10 && root->right->val == 20 && root->height == 2)) {
+        return 0;
+    }
+    root = insert(root, 30);
+    if (!(root->val == 20 && root->height == 2 && 
+        root->left->val == 10 && root->right->val == 30)) {
+        return 0;
+    }
+    root = insert(root, 40);
+    root = insert(root, 50);
+    root = insert(root, 60);
+#ifdef DEBUG
+    preOrder(root);
+#endif
+}
+
 
 int main() {
     int (*testFuncs[])() = {
+        TestBalance01,
         TestGetHeight01,
         TestGetHeight02,
         TestGetHeight03,
@@ -148,12 +191,14 @@ int main() {
         TestUpdateHeight01,
         TestUpdateHeight02,
         TestLeftRotate01,
-        TestRightRotate01
+        TestRightRotate01,
+        TestInsert01,
+        TestInsert02,
     };
     int testCases = sizeof(testFuncs) / sizeof(testFuncs[0]);
     for(int i=0; i<testCases;i++) {
         int result = testFuncs[i]();
-        if(result == 1) {
+        if(result == 1) { // result == 1, means passed testcase.
             printf("\033[32m.\033[0m");
         } else {
             printf("\033[31m.\033[0m");
