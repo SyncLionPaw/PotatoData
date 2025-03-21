@@ -73,31 +73,32 @@ int TestSearch03() { // search nt found, cause its not a valid avl tree
     } return 0;
 }
 
-int TestTsValidAVL01() {
+int TestIsValidBst01() {
     TreeNode one = {1, 0, NULL, NULL};
     TreeNode three = {3, 0, NULL, NULL};
     TreeNode two = {2, 1, &three, &one}; // a fake avl tree.
-    if(!isValidAVL(&two, -INT_MAX, INT_MAX)) { // should be false
+    if(!isValidBst(&two, -INT_MAX, INT_MAX)) { // should be false
         return 1;
     }return 0;
 }
 
-int TestTsValidAVL02() {
+int TestIsValidBst02() {
     TreeNode one = {1, 0, NULL, NULL};
     TreeNode three = {3, 0, NULL, NULL};
     TreeNode two = {2, 1, &one, &three}; // valid tree
-    if(isValidAVL(&two, -INT_MAX, INT_MAX)) {
+    if(isValidBst(&two, -INT_MAX, INT_MAX)) {
         return 1;
     }return 0;
 }
 
 int TestLeftRotate01() {
+    // test left rotate node(5)
     //     5
-	//    /  \
+	//    /  \ 
 	//   3    9
-	//       / \
+	//       / \ 
 	//      6   14
-    //            \
+    //            \ 
     //            17
     TreeNode seventeen = {17, 1, NULL, NULL};
     TreeNode fourteen = {14, 2, NULL, &seventeen};
@@ -113,6 +114,27 @@ int TestLeftRotate01() {
     }return 0;
 }
 
+// 正确的做法是对第一个失衡的节点（路径最下面的）进行旋转，这里只是为了测试，所以对7右旋之后还是不平衡
+int TestRightRotate01() {
+    //     7              3
+	//    /  \           /  \ 
+	//   3    9         0    7
+	//  /\                  /  \ 
+	// 0  5                5    9
+    //     \                \  
+    //      6                6
+    TreeNode six = {6, 1, NULL, NULL};
+    TreeNode five = {5, 2, NULL, &six};
+    TreeNode zero = {0, 1, NULL, NULL};
+    TreeNode three = {3, 3, &zero, &five};
+    TreeNode nine = {9, 1, NULL, NULL};
+    TreeNode seven = {7, 4, &three, &nine};
+    TreeNode* newRoot = rightRotate(&seven);
+    if(newRoot == &three && seven.height == 3 && three.height == 4) {
+        return 1;
+    } return 0;
+}
+
 
 int main() {
     int (*testFuncs[])() = {
@@ -121,11 +143,12 @@ int main() {
         TestGetHeight03,
         TestSearch01,
         TestSearch02,
-        TestTsValidAVL01,
-        TestTsValidAVL02,
+        TestIsValidBst01,
+        TestIsValidBst02,
         TestUpdateHeight01,
         TestUpdateHeight02,
-        TestLeftRotate01
+        TestLeftRotate01,
+        TestRightRotate01
     };
     int testCases = sizeof(testFuncs) / sizeof(testFuncs[0]);
     for(int i=0; i<testCases;i++) {

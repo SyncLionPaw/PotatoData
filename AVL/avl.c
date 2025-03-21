@@ -14,13 +14,13 @@ int updateHeight(TreeNode* root) {
 }
 
 // check if root is an valid avl tree
-bool isValidAVL(TreeNode* root, int llimit, int rlimit) {
+bool isValidBst(TreeNode* root, int llimit, int rlimit) {
     if(root == NULL) return true;
     if (!(llimit < root->val && root->val < rlimit)) {
         return false;
     }
-    return isValidAVL(root->left, llimit, MIN(rlimit, root->val)) &&
-        isValidAVL(root->right, MAX(llimit, root->val), rlimit);
+    return isValidBst(root->left, llimit, MIN(rlimit, root->val)) &&
+        isValidBst(root->right, MAX(llimit, root->val), rlimit);
 }
 
 // search val in root tree
@@ -37,7 +37,7 @@ TreeNode* search(TreeNode* root, int target) {
 
 // insert value into root avl tree
 TreeNode* insert(TreeNode* root, int val) {
-
+    
 }
 
 
@@ -55,4 +55,19 @@ TreeNode* leftRotate(TreeNode* root) {
     updateHeight(root);
     updateHeight(rchild);
     return rchild;
+}
+
+// apply right rotate operation on root, return new root
+TreeNode* rightRotate(TreeNode* root) {
+    if(root == NULL) return root;
+    
+    TreeNode* lchild = root->left; // if operate leftRotate, rchild must not be null
+    TreeNode* rOflchild = lchild->right;
+
+    root->left = rOflchild;
+    lchild->right = root;
+    // update height of root and rChild, remember, root first update, then newroot
+    updateHeight(root);
+    updateHeight(lchild);
+    return lchild;
 }

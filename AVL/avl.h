@@ -16,8 +16,8 @@ int getHeight(TreeNode* root);
 // update height after rotates
 int updateHeight(TreeNode* root);
 
-// check if root is an valid avl tree
-bool isValidAVL(TreeNode* root, int, int);
+// check if root is an valid bst
+bool isValidBst(TreeNode* root, int, int);
 
 // search val in root tree
 TreeNode* search(TreeNode* root, int target);
@@ -27,5 +27,8 @@ TreeNode* insert(TreeNode* root, int val);
 
 // apply left rotate operation on root, return new root
 TreeNode* leftRotate(TreeNode* root);
+
+// apply right rotate operation on root, return new root
+TreeNode* rightRotate(TreeNode* root);
 
 // TODO: delete node from root
