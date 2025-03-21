@@ -5,31 +5,12 @@
 
 int getHeight(TreeNode* root) {
     if(root == NULL) return 0;
-    return MAX(getHeight(root->left), getHeight(root->right)) + 1;
+    return root->height;
 }
 
-int TestGetHeight01() {
-    TreeNode one = {1, 0, NULL, NULL};
-    if(getHeight(&one) == 1) {
-        return 1;
-    }
-    return 0;
-}
-
-int TestGetHeight02() {
-    TreeNode one = {1, 0, NULL, NULL};
-    TreeNode two = {2, 1, NULL, &one};
-    if(getHeight(&two) == 2) {
-        return 1;
-    }
-    return 0;
-}
-
-int TestGetHeight03() {
-    if(getHeight(NULL) == 0) {
-        return 1;
-    }
-    return 0;
+int updateHeight(TreeNode* root) {
+    if(root == NULL) return 0;
+    root->height = MAX(getHeight(root->left), getHeight(root->right)) + 1;
 }
 
 // check if root is an valid avl tree
@@ -38,7 +19,8 @@ bool isValidAVL(TreeNode* root, int llimit, int rlimit) {
     if (!(llimit < root->val && root->val < rlimit)) {
         return false;
     }
-    return isValidAVL(root->left, )
+    return isValidAVL(root->left, llimit, MIN(rlimit, root->val)) &&
+        isValidAVL(root->right, MAX(llimit, root->val), rlimit);
 }
 
 // search val in root tree
@@ -52,34 +34,25 @@ TreeNode* search(TreeNode* root, int target) {
     return search(root->right, target);
 }
 
-int TestSearch01() {
-    TreeNode* root = NULL;
-    if(search(root, 1) == NULL) {
-        return 1;
-    }return 0;
-}
 
 // insert value into root avl tree
 TreeNode* insert(TreeNode* root, int val) {
 
 }
 
-#define TESTCASE 4
 
-int main() {
-    int (*testFuncs[TESTCASE])() = {
-        TestGetHeight01,
-        TestGetHeight02,
-        TestGetHeight03,
-        TestSearch01
-    };
-    for(int i=0; i<TESTCASE;i++) {
-        int result = testFuncs[i]();
-        if(result == 1) {
-            printf("\033[32m.\033[0m");
-        } else {
-            printf("\033[31m.\033[0m");
-        }
-    }
-    printf("\n");
+// apply left rotate operation on root, return new root
+TreeNode* leftRotate(TreeNode* root) {
+    if(root == NULL) return root;
+    
+    TreeNode* rchild = root->right; // if operate leftRotate, rchild must not be null
+    TreeNode* lOfrchild = rchild->left;
+
+    root->right = lOfrchild;
+    rchild->left = root;
+    // update height of root and rChild, remember, root first update, then newroot
+    // update height, why we only need to update root and child?
+    updateHeight(root);
+    updateHeight(rchild);
+    return rchild;
 }
