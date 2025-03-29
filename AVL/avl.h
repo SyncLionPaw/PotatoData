@@ -45,5 +45,6 @@ void preOrder(TreeNode* root);
 void inOrder(TreeNode* root);
 
 // TODO: delete node from root
+TreeNode* delete(TreeNode* root, int val);
 
 void printInOrder(TreeNode* root, void (*func)(TreeNode* root));

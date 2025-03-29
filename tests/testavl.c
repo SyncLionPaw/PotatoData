@@ -1,7 +1,8 @@
 #include "avl.h"
-#include<stdio.h>
-#include<assert.h>
-#include<limits.h>
+#include <stdio.h>
+#include <assert.h>
+#include <limits.h>
+#include <stdlib.h>
 
 
 int TestGetHeight01() {
@@ -178,22 +179,236 @@ int TestInsert02() {
 }
 
 
+int TestDelete01() {
+    TreeNode* root = NULL;
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 70);
+    root = delete(root, 70);
+    
+    if (isValidBst(root, -INT_MAX, INT_MAX) 
+        && balance(root) <= 1 
+        && balance(root) >= -1 
+        && getHeight(root) == 2) {
+        freeTree(root);
+        return 1;
+    }
+    freeTree(root);
+    return 0;
+}
+
+int TestDelete05() {
+    TreeNode* root = NULL;
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 70);
+    root = insert(root, 20);
+    root = insert(root, 40);
+    root = insert(root, 60);
+    root = insert(root, 80);
+    
+    // 删除40引发双旋转
+    root = delete(root, 40);
+    
+    assert(isValidBst(root, -INT_MAX, INT_MAX));
+    assert(abs(balance(root)) <= 1);
+    assert(getHeight(root) == 3);
+    
+    freeTree(root);
+    return 1;
+}
+
+int TestDelete09() {
+    TreeNode* root = NULL;
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 70);
+    root = insert(root, 20);
+    
+    // 删除70验证高度更新
+    root = delete(root, 70);
+    
+    assert(getHeight(root) == 3);
+    assert(root->left->height == 2);
+    freeTree(root);
+    return 1;
+}
+
+int TestDelete010() {
+    TreeNode* root = NULL;
+    root = insert(root, 50);
+    root = insert(root, 30);
+    
+    // 删除不存在节点
+    TreeNode* before = root;
+    root = delete(root, 999);
+    
+    assert(root == before);
+    assert(isValidBst(root, -INT_MAX, INT_MAX));
+    freeTree(root);
+    return 1;
+}
+
+int TestDelete06() {
+    TreeNode* root = newTreeNode(100);
+    root = delete(root, 100);
+    
+    assert(root == NULL);
+    assert(isValidBst(root, -INT_MAX, INT_MAX));
+    
+    freeTree(root);
+    return 1;
+}
+
+int TestDelete07() {
+    TreeNode* root = NULL;
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 70);
+    root = insert(root, 20);
+    
+    // 删除70验证高度更新
+    assert(getHeight(root) == 3);
+
+    root = delete(root, 70);
+    
+    assert(root->height == 2);
+    freeTree(root);
+    return 1;
+}
+
+
+int TestDelete02() {
+    TreeNode* root = NULL;
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 70);
+    root = insert(root, 20);
+    root = delete(root, 30);
+
+    int result = 1;
+    
+    // 分离每个断言条件
+    if (root->val != 50) {
+        printf("\nRoot value error! Expected 50, got %d", root->val);
+        result = 0;
+    }
+    
+    if (root->left == NULL || root->left->val != 20) {
+        printf("\nLeft child error! Expected 20, got %d", root->left ? root->left->val : -1);
+        result = 0;
+    }
+    
+    if (root->left->height != 1) {
+        printf("\nLeft height error! Expected 1, got %d", root->left->height);
+        result = 0;
+    }
+    
+    if (!isValidBst(root, -INT_MAX, INT_MAX)) {
+        printf("\nBST validation failed!");
+        result = 0;
+    }
+    
+    if (balance(root) != 0) {
+        printf("\nBalance factor error! Expected 0, got %d", balance(root));
+        result = 0;
+    }
+    
+    if (getHeight(root) != 2) {
+        printf("\nTree height error! Expected 2, got %d", getHeight(root));
+        result = 0;
+    }
+
+    freeTree(root);
+    return result;
+}
+
+int TestDelete03() {
+    TreeNode* root = NULL;
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 70);
+    root = insert(root, 20);
+    root = insert(root, 40);
+    root = insert(root, 60);
+    root = insert(root, 80);
+    
+    root = delete(root, 50);
+    
+    int result = 1;
+    if (root->val != 60) result = 0;
+    if (root->left->val != 30 || root->right->val != 70) result = 0;
+    if (root->left->right->val != 40) result = 0;
+    if (!isValidBst(root, -INT_MAX, INT_MAX)) result = 0;
+    if (abs(balance(root)) > 1) result = 0;
+    
+    freeTree(root);
+    return result;
+}
+
+int TestDelete04() {
+    TreeNode* root = NULL;
+    root = insert(root, 30);
+    root = insert(root, 20);
+    root = insert(root, 40);
+    root = insert(root, 10);
+    root = insert(root, 25);
+    root = insert(root, 35);
+    root = insert(root, 50);
+    
+    root = delete(root, 10);
+    root = delete(root, 50);
+    
+    int result = 1;
+    if (root->val != 30) result = 0;
+    if (root->left->val != 20 || root->right->val != 40) result = 0;
+    if (root->left->right->val != 25) result = 0;
+    if (root->right->left->val != 35) result = 0;
+    if (getHeight(root) != 3) result = 0;
+    
+    freeTree(root);
+    return result;
+}
+
+int TestDelete08() {
+    TreeNode* root = NULL;
+    root = insert(root, 50);
+    root = insert(root, 30);
+    
+    // 删除不存在节点
+    TreeNode* before = root;
+    root = delete(root, 999);
+    
+    assert(root == before);
+    assert(isValidBst(root, -INT_MAX, INT_MAX));
+    freeTree(root);
+    return 1;
+}
+
 int main() {
     int (*testFuncs[])() = {
         TestBalance01,
+        TestDelete01,
+        TestDelete02,
+        TestDelete03,
+        TestDelete04,
+        TestDelete05,
+        TestDelete06,
+        TestDelete07,
+        TestDelete08,
         TestGetHeight01,
         TestGetHeight02,
         TestGetHeight03,
-        TestSearch01,
-        TestSearch02,
-        TestIsValidBst01,
-        TestIsValidBst02,
-        TestUpdateHeight01,
-        TestUpdateHeight02,
-        TestLeftRotate01,
-        TestRightRotate01,
         TestInsert01,
         TestInsert02,
+        TestIsValidBst01,
+        TestIsValidBst02,
+        TestLeftRotate01,
+        TestRightRotate01,
+        TestSearch01,
+        TestSearch02,
+        TestUpdateHeight01,
+        TestUpdateHeight02,
     };
     int testCases = sizeof(testFuncs) / sizeof(testFuncs[0]);
     for(int i=0; i<testCases;i++) {

@@ -75,7 +75,7 @@ TreeNode* insert(TreeNode* root, int val) {
     int bf = balance(root);
     if(bf == 2) {
         int lbf = balance(root->left);
-        if(lbf > 0 ) { // or == 1, LL
+        if(lbf > 0) { // or == 1, LL
             newRoot = rightRotate(root);
         } else {      // LR, lrotate left child, then rrotate self
             root->left = leftRotate(root->left);
@@ -128,6 +128,57 @@ TreeNode* rightRotate(TreeNode* root) {
     updateHeight(root);
     updateHeight(lchild);
     return lchild;
+}
+
+// delete node from root avl tree, return new root
+TreeNode* delete(TreeNode* root, int val) {
+    if(root == NULL) return root;
+    if(root->val == val) {
+        if(root->left == NULL && root->right == NULL) {
+            free(root);
+            return NULL;
+        } else if (root->left == NULL) {
+            TreeNode* newRoot = root->right;
+            free(root);
+            return newRoot;
+        } else if (root->right == NULL) {
+            TreeNode* newRoot = root->left;
+            free(root);
+            return newRoot;
+        } else { // left and right child both exist, find the smallest node in right subtree, replace root with it
+            TreeNode* newRoot = root->right;
+            while(newRoot->left != NULL) {
+                newRoot = newRoot->left;
+            }
+            root->val = newRoot->val;
+            root->right = delete(root->right, newRoot->val);
+        }
+    } else if (root->val < val) {
+        root->right = delete(root->right, val);
+    } else {
+        root->left = delete(root->left, val);
+    }
+    updateHeight(root);
+    // finished delete, check balance factor
+    int bf = balance(root);
+    if(bf == 2) { // L?
+        int lbf = balance(root->left);
+        if(lbf >= 0) { // left child balance factor > 0 or == 0, LL
+            return rightRotate(root);
+        } else { // LR, left child balance factor < 0, lrotate left child, then rrotate self
+            root->left = leftRotate(root->left);
+            return rightRotate(root);
+        }
+    } else if (bf == -2) { // R?
+        int rbf = balance(root->right);
+        if(rbf <= 0) { // right child balance factor < 0 or == 0, RR
+            return leftRotate(root);
+        } else { // RL, right child balance factor > 0, rrotate right child, thrn lrotate self
+            root->right = rightRotate(root->right);
+            return leftRotate(root);
+        }
+    }
+    return root;
 }
 
 void preOrder(TreeNode* root) {
